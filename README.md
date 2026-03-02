@@ -12,7 +12,7 @@ El equipo detrás de MediAlerta está conformado por Colin Cardenas Kelly Anahi 
 
 **Link de descarga:** https://edith294.github.io/PaginawebappSalud/
 
-**Vídeo de prueba:** https://drive.google.com/file/d/1xIXpM33FM7raiktjbWgTmhMpb74Ps2iN/view?usp=sharing
+**Vídeo de prueba:** https://drive.google.com/file/d/1jhR9yCSeSNZnkK69muwGKN_AfzfTX1E_/view?usp=drive_link
 
 ---
 
