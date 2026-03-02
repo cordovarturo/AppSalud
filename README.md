@@ -3137,11 +3137,9 @@ package mx.edu.utng.aimc.com.pantallaprincipal.ui.screens.home
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -3149,29 +3147,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-
-private val Pink = Color(0xFFFF7EB5)
-private val PinkBorder = Color(0xFFD81B60)
-
-private val Purple = Color(0xFFA56CFF)
-private val PurpleBorder = Color(0xFF6A1B9A)
-
-private val Yellow = Color(0xFFFFD93D)
-private val YellowBorder = Color(0xFFF7B500)
-
-private val Green = Color(0xFF74FF8F)
-private val GreenBorder = Color(0xFF00C853)
-
-private val BackgroundLilac = Color(0xFFF4E9FF)
+import mx.edu.utng.aimc.com.pantallaprincipal.ui.theme.AppleBlue
+import mx.edu.utng.aimc.com.pantallaprincipal.ui.theme.AppleGray
+import mx.edu.utng.aimc.com.pantallaprincipal.ui.theme.AppleRed
 
 @Composable
 fun MediAlertaScreen(
@@ -3182,162 +3167,150 @@ fun MediAlertaScreen(
     onNavigateToFarmacias: () -> Unit = {},
     onNavigateToConfiguracion: () -> Unit = {},
 ) {
-
     val context = LocalContext.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundLilac)
-    ) {
-
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(padding)
+                .padding(horizontal = 20.dp)
         ) {
+            Spacer(modifier = Modifier.height(40.dp))
 
-            Spacer(modifier = Modifier.height(25.dp))
-
+            // Apple Style Header
             Text(
                 text = "MediAlerta",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4A148C)
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-1).sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
                 text = "Tu salud en tus manos",
-                fontSize = 17.sp,
-                color = Color(0xFF6A1B9A),
-                modifier = Modifier.padding(top = 4.dp)
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppleGray
             )
 
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(60.dp)
-                    .shadow(12.dp, RoundedCornerShape(16.dp))
-                    .clickable {
-                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))
-                        context.startActivity(intent)
-                    },
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE53935)
-                )
+            // Emergency Section (Clean & Minimalist)
+            EmergencyButton(onClick = {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))
+                context.startActivity(intent)
+            })
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Main Grid
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = "Emergencia 911",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(35.dp))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-
-                    PrettyCard(
+                item {
+                    MenuCard(
                         title = "Medicamentos",
-                        color = Pink,
-                        borderColor = PinkBorder,
                         icon = Icons.Default.MedicalServices,
+                        color = AppleBlue,
                         onClick = onNavigateToMedicationList
                     )
-
-                    PrettyCard(
+                }
+                item {
+                    MenuCard(
                         title = "Citas",
-                        color = Purple,
-                        borderColor = PurpleBorder,
                         icon = Icons.Default.CalendarMonth,
+                        color = Color(0xFF5856D6), // iOS Purple
                         onClick = onNavigateToCitas
                     )
                 }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-
-                    PrettyCard(
+                item {
+                    MenuCard(
                         title = "Farmacias",
-                        color = Yellow,
-                        borderColor = YellowBorder,
                         icon = Icons.Default.LocalPharmacy,
+                        color = Color(0xFFFF9500), // iOS Orange
                         onClick = onNavigateToFarmacias
                     )
-
-                    PrettyCard(
+                }
+                item {
+                    MenuCard(
                         title = "Configuración",
-                        color = Green,
-                        borderColor = GreenBorder,
                         icon = Icons.Default.Settings,
+                        color = AppleGray,
                         onClick = onNavigateToConfiguracion
                     )
                 }
             }
         }
-
-        Image(
-            painter = painterResource(id = R.drawable.estetoscopio),
-            contentDescription = "Ilustración fondo",
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .size(250.dp)
-                .padding(bottom = 10.dp),
-            alpha = 0.90f
-        )
     }
 }
 
 @Composable
-fun PrettyCard(
-    icon: ImageVector,
+fun EmergencyButton(onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        color = AppleRed.copy(alpha = 0.1f),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(Icons.Default.Call, contentDescription = null, tint = AppleRed)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Emergencia 911",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = AppleRed
+            )
+        }
+    }
+}
+
+@Composable
+fun MenuCard(
     title: String,
+    icon: ImageVector,
     color: Color,
-    borderColor: Color,
     onClick: () -> Unit
 ) {
-
-    Card(
+    Surface(
+        onClick = onClick,
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(22.dp),
         modifier = Modifier
-            .size(width = 150.dp, height = 120.dp)
-            .shadow(8.dp, RoundedCornerShape(20.dp))
-            .clickable { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = color),
-        border = BorderStroke(3.dp, borderColor)
+            .aspectRatio(1.2f)
+            .fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = Color.White,
-                modifier = Modifier.size(38.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(color.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = color,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
             Text(
                 text = title,
-                color = Color.White,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -3346,7 +3319,7 @@ fun PrettyCard(
 
 ### Descripción General
 
-Este archivo contiene la pantalla principal de la aplicación. Desde aquí el usuario puede acceder a todas las funciones principales: medicamentos, citas médicas, farmacias cercanas y configuración. También incluye un botón destacado de emergencia para llamar al 911.
+Este archivo contiene la pantalla principal de la aplicación, rediseñada con una estética minimalista inspirada en iOS. Se reemplazaron las tarjetas coloridas con bordes por una cuadrícula limpia con iconos sobre superficies neutras, y el botón de emergencia pasó de ser un `Card` rojo sólido a un `Surface` semitransparente.
 
 ### Ubicación
 
@@ -3354,32 +3327,43 @@ Este archivo contiene la pantalla principal de la aplicación. Desde aquí el us
 
 ### Explicación Detallada
 
+**Cambios respecto a la versión anterior**
+
+La versión anterior usaba un fondo lila fijo (`BackgroundLilac`), colores locales hardcodeados (rosa, morado, amarillo, verde) y el componente `PrettyCard` con bordes de color. La versión actualizada introduce los siguientes cambios:
+
+- **Fondo del sistema**: Se eliminó el `Box` con fondo lila y se reemplazó por `Scaffold` con `containerColor = MaterialTheme.colorScheme.background`, lo que respeta automáticamente el tema claro/oscuro.
+- **Tipografía del sistema**: El título ahora usa `MaterialTheme.typography.headlineLarge` en lugar de un tamaño fijo en `sp`, adaptándose a las preferencias de accesibilidad del usuario.
+- **Cuadrícula con `LazyVerticalGrid`**: Las dos filas con `Row` se reemplazaron por un `LazyVerticalGrid` de 2 columnas, más flexible y escalable.
+- **Nuevo componente `MenuCard`**: Reemplaza a `PrettyCard`. Usa `Surface` en lugar de `Card`, sin borde de color, con un ícono sobre un fondo semitransparente del color de la sección.
+- **Nuevo componente `EmergencyButton`**: Reemplaza al `Card` rojo sólido. Usa `Surface` con el color `AppleRed` al 10% de opacidad y texto e ícono en `AppleRed`, más sutil visualmente.
+- **Se eliminó la imagen decorativa del estetoscopio** del fondo inferior.
+- **Se eliminaron los colores locales** (`Pink`, `Purple`, `Yellow`, `Green` y sus bordes). Los colores de las tarjetas ahora son: `AppleBlue` para Medicamentos, `#5856D6` (morado iOS) para Citas, `#FF9500` (naranja iOS) para Farmacias y `AppleGray` para Configuración.
+
 **MediAlertaScreen()**
 
-Pantalla de inicio con el nombre de la aplicación, un botón de emergencia destacado, cuatro tarjetas de navegación y una imagen decorativa en la parte inferior.
+Pantalla de inicio que usa `Scaffold` como contenedor raíz. Muestra el encabezado, el botón de emergencia y la cuadrícula de navegación.
 
 - Parámetros (todos opcionales): `onNavigateToMedicamentos`, `onNavigateToMedicationList`, `onNavigateToCitas`, `onNavigateToFarmacias`, `onNavigateToConfiguracion`.
-- Nota: Hay dos callbacks para medicamentos (`onNavigateToMedicamentos` y `onNavigateToMedicationList`), pero solo se usa `onNavigateToMedicationList` en la tarjeta.
 
-**Componentes de la Pantalla**
+**EmergencyButton()**
 
-*Título y Subtítulo* — "MediAlerta" en morado oscuro (40sp, negritas) y subtítulo "Tu salud en tus manos" en morado más claro.
+Componente de emergencia con fondo rojo semitransparente. Muestra un ícono de llamada y el texto "Emergencia 911" en `AppleRed`. Al presionarlo abre el marcador telefónico con el 911.
 
-*Botón de Emergencia 911* — Botón rojo que ocupa el 85% del ancho, con sombra pronunciada (12dp). Al presionarlo abre el marcador telefónico con el número 911 ya marcado.
+**MenuCard()**
 
-*Tarjetas de Navegación* — Cuatro tarjetas en dos filas: Medicamentos (rosa), Citas (púrpura), Farmacias (amarillo) y Configuración (verde). Cada tarjeta tiene borde de 3dp, sombra de 8dp, esquinas redondeadas de 20dp, ícono blanco de 38dp y toda la tarjeta es clicable.
-
-*Imagen Decorativa* — Imagen de un estetoscopio (`res/drawable/estetoscopio.png`), semi-transparente (alpha 0.9), alineada en la parte inferior central.
-
-**PrettyCard()**
-
-Componente reutilizable para las tarjetas de navegación. Recibe `icon`, `title`, `color`, `borderColor` y `onClick`.
+Componente reutilizable para las tarjetas de navegación. Recibe `title`, `icon`, `color` y `onClick`. El fondo del ícono usa el color de la tarjeta al 10% de opacidad sobre la superficie neutra del tema, y el texto usa el color `onSurface` del esquema activo.
 
 ### Flujo de Trabajo
 
-1. Usuario abre la aplicación → llega a esta pantalla.
-2. Presionar "Emergencia 911" → abre el marcador con el 911.
+1. Usuario abre la aplicación → llega a esta pantalla con el tema activo (claro u oscuro).
+2. Presionar el botón de emergencia → abre el marcador con el 911.
 3. Presionar cualquier tarjeta → navega a la sección correspondiente.
+
+### Archivos Relacionados
+
+- `Color.kt` — Define `AppleBlue`, `AppleGray`, `AppleRed` usados en esta pantalla.
+- `Theme.kt` — Proporciona el esquema de colores (`background`, `surface`, `onSurface`, `onBackground`).
+- `NavGraph.kt` — Configura los callbacks de navegación que recibe esta pantalla.
 
 ---
 
@@ -4147,18 +4131,172 @@ val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
 
+// Apple-inspired minimalist palette
+val AppleBlue = Color(0xFF007AFF)
+val AppleGreen = Color(0xFF34C759)
+val AppleRed = Color(0xFFFF3B30)
+val AppleGray = Color(0xFF8E8E93)
+val AppleLightGray = Color(0xFFE5E5EA)
+val AppleExtraLightGray = Color(0xFFF2F2F7)
+
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+val BackgroundLight = Color(0xFFFFFFFF)
+val BackgroundDark = Color(0xFF000000)
+
+val SurfaceLight = Color(0xFFF2F2F7)
+val SurfaceDark = Color(0xFF1C1C1E)
+
+val TextPrimaryLight = Color(0xFF000000)
+val TextSecondaryLight = Color(0xFF3C3C43).copy(alpha = 0.6f)
+
+val TextPrimaryDark = Color(0xFFFFFFFF)
+val TextSecondaryDark = Color(0xFFEBEBF5).copy(alpha = 0.6f)
 ```
 
 ### Descripción General
 
-Este archivo define los colores principales que se usan en el tema de la aplicación. Los colores están organizados en dos grupos: los de la paleta clara (versión 40, más oscuros) y los de la paleta oscura (versión 80, más claros). Esta es la paleta base que Material 3 usa para generar el esquema de colores completo.
+Este archivo define los colores principales que se usan en el tema de la aplicación. En esta versión actualizada, se mantiene la paleta original de Material 3 y se añade una nueva paleta inspirada en el diseño de Apple (iOS), que reemplaza los colores primarios del tema para lograr una estética más minimalista y moderna.
 
 ### Ubicación
 
 `mx.edu.utng.aimc.com.pantallaprincipal.ui.theme`
+
+### Explicación Detallada
+
+**Paleta original de Material 3**
+
+Se conservan los colores de la paleta base heredada de la configuración inicial del proyecto, organizados en dos grupos:
+
+- Versión 80 (más claros, para tema oscuro): `Purple80`, `PurpleGrey80`, `Pink80`.
+- Versión 40 (más oscuros, para tema claro): `Purple40`, `PurpleGrey40`, `Pink40`.
+
+**Paleta Apple-inspired**
+
+Se agregó un nuevo conjunto de colores semánticos inspirados en el sistema de diseño de iOS. Cada color tiene un propósito claro y reconocible:
+
+- `AppleBlue` (#007AFF): Color primario de acción, equivalente al azul estándar de iOS.
+- `AppleGreen` (#34C759): Color de éxito o confirmación.
+- `AppleRed` (#FF3B30): Color de alerta, errores o acciones destructivas.
+- `AppleGray` (#8E8E93): Color secundario para texto e íconos de menor jerarquía.
+- `AppleLightGray` (#E5E5EA): Color para bordes y separadores sutiles.
+- `AppleExtraLightGray` (#F2F2F7): Color de fondo para superficies secundarias.
+
+**Colores de fondo y superficie**
+
+Se definen variantes explícitas para tema claro y oscuro:
+
+- `BackgroundLight` / `BackgroundDark`: Color de fondo de pantalla completa (blanco puro / negro puro).
+- `SurfaceLight` / `SurfaceDark`: Color de superficies como tarjetas y contenedores (#F2F2F7 / #1C1C1E).
+
+**Colores de texto**
+
+Se definen colores semánticos para texto primario y secundario en ambos temas:
+
+- `TextPrimaryLight` / `TextPrimaryDark`: Negro y blanco puros para texto principal.
+- `TextSecondaryLight` / `TextSecondaryDark`: Versiones con opacidad reducida (60%) para texto de menor importancia.
+
+### Archivos Relacionados
+
+- `Theme.kt` — Donde se usan estos colores para construir los esquemas de color claro y oscuro.
+
+---
+
+## Theme.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.ui.theme
+
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+
+private val LightColorScheme = lightColorScheme(
+    primary = AppleBlue,
+    secondary = AppleGray,
+    tertiary = AppleGreen,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+)
+
+private val DarkColorScheme = darkColorScheme(
+    primary = AppleBlue,
+    secondary = AppleGray,
+    tertiary = AppleGreen,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+)
+
+fun PantallaPrincipalTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
+    MaterialTheme(
+        content = content
+    )
+}
+```
+
+### Descripción General
+
+Este archivo configura el tema visual de toda la aplicación usando Material 3. En esta versión actualizada, el tema abandona los colores morados predeterminados de Material 3 y los colores dinámicos de Android 12+ para adoptar la nueva paleta Apple-inspired definida en `Color.kt`. Esto resulta en una interfaz más minimalista con colores consistentes entre dispositivos.
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.ui.theme`
+
+### Explicación Detallada
+
+**Cambios respecto a la versión anterior**
+
+La versión anterior usaba los colores morados de Material 3 y admitía colores dinámicos en Android 12+. La versión actualizada realiza dos cambios principales:
+
+- **Nueva paleta**: Ambos esquemas (claro y oscuro) ahora usan `AppleBlue` como color primario, `AppleGray` como secundario y `AppleGreen` como terciario.
+- **Sin colores dinámicos**: Se eliminó el bloque `when` que habilitaba `dynamicDarkColorScheme` / `dynamicLightColorScheme`. Ahora el esquema se determina únicamente con `if (darkTheme) DarkColorScheme else LightColorScheme`, lo que garantiza colores idénticos en todos los dispositivos independientemente de su fondo de pantalla.
+
+**LightColorScheme**
+
+Esquema para tema claro con fondo blanco puro (`BackgroundLight`), superficies en gris muy suave (`SurfaceLight` = #F2F2F7) y texto negro sobre fondo y superficie (`TextPrimaryLight`).
+
+**DarkColorScheme**
+
+Esquema para tema oscuro con fondo negro puro (`BackgroundDark`), superficies en gris oscuro (`SurfaceDark` = #1C1C1E, equivalente al gris oscuro de iOS) y texto blanco (`TextPrimaryDark`).
+
+**PantallaPrincipalTheme()**
+
+Función composable que aplica el tema a toda la aplicación. Recibe `darkTheme` (que por defecto sigue la preferencia del sistema) y selecciona el esquema de color correspondiente.
+
+### Notas Importantes
+
+- Al eliminar los colores dinámicos, la apariencia de la app es uniforme en todos los dispositivos, lo cual es coherente con el objetivo del rediseño estilo iOS.
+- El color primario `AppleBlue` (#007AFF) es el mismo en ambos temas, igual que en el sistema de diseño de iOS.
+- Los colores `onBackground` y `onSurface` del `DarkColorScheme` son `TextPrimaryDark` (blanco), lo que asegura legibilidad sobre los fondos oscuros.
+
+### Archivos Relacionados
+
+- `Color.kt` — Define todos los valores de color usados aquí.
+- `MainActivity.kt` — Donde se llama a `PantallaPrincipalTheme()` para envolver la aplicación.
 
 ---
 
