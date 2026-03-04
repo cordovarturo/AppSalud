@@ -1,4 +1,4 @@
-# MediAlert01
+# App Salud "Tú salud está en tus manos"
 
 ## Introducción
 
