@@ -1,6 +1,6 @@
 # App Salud 
 
-#Tú salud está en tus manos
+Tú salud está en tus manos
 
 ## Introducción
 
