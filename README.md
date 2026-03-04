@@ -1,4 +1,4 @@
-# App Salud "Tú salud está en tus manos"
+# App Salud (Tú salud está en tus manos) 
 
 ## Introducción
 
