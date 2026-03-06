@@ -1,6 +1,4 @@
-# App Salud 
-
-Tú salud está en tus manos
+# App Salud
 
 ## Introducción
 
@@ -14,7 +12,7 @@ El equipo detrás de MediAlerta está conformado por Colin Cardenas Kelly Anahi 
 
 **Link de descarga:** https://edith294.github.io/PaginawebappSalud/
 
-**Vídeo de prueba:** https://drive.google.com/file/d/1N0eYmWK97Ir44SDTeZkGFRnkBlI29fDI/view?usp=drive_link
+**Vídeo de prueba:** https://drive.google.com/file/d/1xIXpM33FM7raiktjbWgTmhMpb74Ps2iN/view?usp=sharing
 
 ---
 
@@ -346,129 +344,7 @@ Un DAO (Data Access Object) es un componente que actúa como intermediario entre
 - `AddMedicationScreen.kt` — Pantalla donde se agregan nuevos medicamentos.
 - `MedicamentosScreen.kt` — Pantalla donde se muestra la lista de medicamentos.
 
----
 
-## AppDatabase.kt
-
-```kotlin
-package mx.edu.utng.aimc.com.pantallaprincipal.data.database
-
-import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import mx.edu.utng.aimc.com.pantallaprincipal.data.dao.MedicationDao
-import mx.edu.utng.aimc.com.pantallaprincipal.data.dao.AppointmentDao
-import mx.edu.utng.aimc.com.pantallaprincipal.data.dao.EmergencyContactDao
-import mx.edu.utng.aimc.com.pantallaprincipal.data.entity.MedicationEntity
-import mx.edu.utng.aimc.com.pantallaprincipal.data.entity.AppointmentEntity
-import mx.edu.utng.aimc.com.pantallaprincipal.data.entity.EmergencyContactEntity
-
-@Database(
-    entities = [MedicationEntity::class, AppointmentEntity::class, EmergencyContactEntity::class],
-    version = 4
-)
-@TypeConverters(Converters::class)
-abstract class AppDatabase : RoomDatabase() {
-
-    abstract fun medicationDao(): MedicationDao
-
-    abstract fun appointmentDao(): AppointmentDao
-
-    abstract fun emergencyContactDao(): EmergencyContactDao
-
-    companion object {
-        @Volatile private var INSTANCE: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val inst = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "med_alert_db"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = inst
-                inst
-            }
-        }
-    }
-}
-```
-
-### Descripción General
-
-Este archivo define la base de datos local de la aplicación usando Room. Es el corazón del almacenamiento de datos en el teléfono, donde se guardan todos los registros de medicamentos, citas médicas y contactos de emergencia. Actúa como el punto central que conecta todas las tablas con sus respectivos DAOs.
-
-### Ubicación
-
-`mx.edu.utng.aimc.com.pantallaprincipal.data.database`
-
-### Explicación Detallada
-
-**¿Qué es AppDatabase?**
-
-`AppDatabase` es la clase principal que representa la base de datos SQLite en el teléfono. Usando Room, se encarga de crear y administrar las tablas, las relaciones entre ellas y proporcionar acceso a los datos a través de los DAOs.
-
-**Anotaciones y su Significado**
-
-`@Database` — Le indica a Room que esta clase es una base de datos. Tiene dos partes importantes:
-
-- `entities`: Lista las clases que serán tablas en la base de datos. Aquí se incluyen `MedicationEntity`, `AppointmentEntity` y `EmergencyContactEntity`.
-- `version`: El número de versión de la base de datos. Cada vez que se cambia la estructura de las tablas, este número debe aumentarse. Actualmente está en la versión 4.
-
-`@TypeConverters` — Indica que se usará la clase `Converters` para convertir tipos de datos especiales que Room no maneja por defecto, como fechas o listas, a formatos que sí puede guardar en SQLite.
-
-**Tablas Incluidas**
-
-La base de datos tiene tres tablas principales:
-
-- `MedicationEntity`: Guarda toda la información de los medicamentos que el usuario registra, como nombre, dosis, horarios, etc.
-- `AppointmentEntity`: Almacena los datos de las citas médicas, incluyendo fecha, hora, lugar y motivo de la cita.
-- `EmergencyContactEntity`: Contiene los contactos de emergencia con nombres, teléfonos y parentesco.
-
-**Métodos Abstractos**
-
-- `medicationDao()`: Proporciona acceso al DAO de medicamentos.
-- `appointmentDao()`: Da acceso al DAO de citas médicas.
-- `emergencyContactDao()`: Permite acceder al DAO de contactos de emergencia.
-
-**Patrón Singleton**
-
-`@Volatile private var INSTANCE` — Esta palabra clave asegura que los cambios en la variable `INSTANCE` sean visibles inmediatamente para todos los hilos de ejecución, previniendo problemas de concurrencia.
-
-`getDatabase(context: Context)` — Proporciona la instancia de la base de datos. Verifica si ya existe una instancia creada; si no, entra en un bloque `synchronized` para crear una sola instancia de forma segura.
-
-**Configuración de la Base de Datos**
-
-`Room.databaseBuilder()` configura la base de datos con tres parámetros:
-
-- `context.applicationContext`: El contexto de la aplicación.
-- `AppDatabase::class.java`: La clase de la base de datos que se está construyendo.
-- `"med_alert_db"`: El nombre del archivo de base de datos.
-
-`.fallbackToDestructiveMigration()` — Cuando hay cambios en las tablas sin una migración definida, Room borra todas las tablas y las vuelve a crear. Es útil durante el desarrollo pero tiene la desventaja de que se pierden todos los datos guardados.
-
-### Flujo de Trabajo Típico
-
-1. **Inicialización**: La aplicación llama a `AppDatabase.getDatabase(context)` para obtener la instancia de la base de datos.
-2. **Acceso a DAOs**: A través de la instancia, la aplicación obtiene los DAOs necesarios.
-3. **Operaciones**: Los ViewModels y Repositorios usan estos DAOs para realizar operaciones en la base de datos.
-4. **Actualizaciones**: Cuando el usuario agrega, modifica o elimina información, los cambios se reflejan inmediatamente.
-
-### Notas Importantes
-
-- La versión actual de la base de datos es la 4, lo que indica que ha pasado por varios cambios estructurales durante el desarrollo.
-- El uso de `.fallbackToDestructiveMigration()` significa que al actualizar la aplicación, todos los datos guardados se perderán. En una versión final para producción, esto debería reemplazarse con migraciones adecuadas.
-- El patrón Singleton con `@Volatile` y `synchronized` asegura que la base de datos funcione correctamente incluso en aplicaciones con múltiples hilos de ejecución.
-
-### Archivos Relacionados
-
-- `Converters.kt` — Clase que convierte tipos especiales para guardarlos en la base de datos.
-- `MedicationDao.kt`, `AppointmentDao.kt`, `EmergencyContactDao.kt` — Los DAOs que esta base de datos proporciona.
-- `MedicationEntity.kt`, `AppointmentEntity.kt`, `EmergencyContactEntity.kt` — Las entidades que definen las tablas.
 
 ---
 
@@ -685,100 +561,7 @@ data class EmergencyContactEntity(
 - `AgregarNumeroEmergencia.kt` — La pantalla donde el usuario agrega nuevos contactos de emergencia.
 - `EmergencyContactViewModel.kt` — El ViewModel que usa esta entidad para manejar el estado.
 
----
 
-## MedicationEntity.kt
-
-```kotlin
-package mx.edu.utng.aimc.com.pantallaprincipal.data.entity
-
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "medications")
-data class MedicationEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String = "",
-    val dose: String = "",
-    val note: String = "",
-    val schedules: List<String> = emptyList(),
-    val days: List<String> = emptyList(),
-    val totalDays: Int = 0,
-    val daysTaken: Int = 0
-)
-```
-
-### Descripción General
-
-Este archivo define la estructura de cómo se guardan los medicamentos en la base de datos del teléfono. Es el molde más completo de la aplicación porque los medicamentos tienen mucha información asociada: el nombre, la dosis, las notas, los horarios, los días de la semana y el progreso del tratamiento.
-
-### Ubicación
-
-`mx.edu.utng.aimc.com.pantallaprincipal.data.entity`
-
-### Explicación Detallada
-
-**Propiedades de la Entidad**
-
-`id: Int = 0` — La llave principal, identificador único de cada medicamento. Se genera automáticamente al guardar.
-
-`name: String = ""` — Almacena el nombre del medicamento. Ejemplos: `"Paracetamol"`, `"Amoxicilina 500mg"`, `"Ibuprofeno"`.
-
-`dose: String = ""` — Guarda la dosis o cantidad. Ejemplos: `"1 tableta"`, `"500 mg"`, `"2 cucharadas"`.
-
-`note: String = ""` — Almacena notas adicionales o instrucciones especiales. Ejemplos: `"Tomar después de los alimentos"`, `"Evitar exponerse al sol"`.
-
-`schedules: List<String> = emptyList()` — Guarda los horarios en los que se debe tomar el medicamento. Es una lista porque puede haber múltiples horarios al día. Los valores se guardan usando los convertidores de `Converters.kt`. Ejemplos: `["8:00 AM", "2:00 PM", "8:00 PM"]`.
-
-`days: List<String> = emptyList()` — Indica los días de la semana en que se debe tomar el medicamento. Ejemplos: `["lunes", "miércoles", "viernes"]`.
-
-`totalDays: Int = 0` — Representa la duración total del tratamiento en días. Ejemplos: `7` para una semana, `30` para un mes. Un valor de `0` podría significar que es un tratamiento continuo sin fecha de finalización.
-
-`daysTaken: Int = 0` — Lleva el conteo de cuántos días se ha tomado el medicamento. Este número aumenta cada vez que el usuario confirma que tomó el medicamento. Cuando `daysTaken` llega a ser igual a `totalDays`, el tratamiento está completo.
-
-**Cómo se Usa en la Práctica**
-
-Crear un nuevo medicamento:
-
-```kotlin
-val nuevoMedicamento = MedicationEntity(
-    name = "Amoxicilina",
-    dose = "500 mg",
-    note = "Tomar cada 12 horas, con alimentos",
-    schedules = listOf("8:00 AM", "8:00 PM"),
-    days = listOf("todos"),
-    totalDays = 7,
-    daysTaken = 0
-)
-```
-
-Actualizar el progreso:
-
-```kotlin
-val medicamentoActualizado = medicamento.copy(
-    daysTaken = medicamento.daysTaken + 1
-)
-medicationDao.updateMedication(medicamentoActualizado)
-```
-
-### Notas Importantes
-
-- Las propiedades `schedules` y `days` son listas que se convierten usando `Converters.kt` antes de guardarse en SQLite.
-- Cuando `totalDays` es 0, podría interpretarse como un tratamiento que no tiene fecha de finalización.
-- La combinación de `totalDays` y `daysTaken` permite mostrar barras de progreso y saber cuándo termina un tratamiento.
-- Los valores por defecto `emptyList()` para `schedules` y `days` son importantes porque evitan listas nulas que podrían causar errores.
-
-### Archivos Relacionados
-
-- `MedicationDao.kt` — El DAO con métodos como `insertMedication()`, `deleteMedication()`, `getAllMedications()` y `updateMedication()`.
-- `AppDatabase.kt` — La base de datos que incluye esta entidad.
-- `Converters.kt` — La clase que convierte las listas a texto para guardarlas.
-- `MedicationRepository.kt` — El repositorio que maneja la lógica de negocio.
-- `FirebaseMedicationRepository.kt` — Para sincronizar con la nube (Firebase).
-- `AddMedicationScreen.kt` — La pantalla donde el usuario agrega nuevos medicamentos.
-- `MedicamentosScreen.kt` — La pantalla donde se muestra la lista con su progreso.
-- `MedicationViewModel.kt` — El ViewModel que usa esta entidad para manejar el estado.
 
 ---
 
@@ -5388,3 +5171,332 @@ MediAlerta es una aplicación funcional y bien estructurada que cumple con los o
 El código está organizado siguiendo buenas prácticas como la separación en capas (data, ui, viewmodel), uso de repositorios, inyección de dependencias y programación reactiva con Flow. Esto hace que la aplicación sea mantenible y escalable para futuras mejoras.
 
 En conclusión, MediAlerta es una herramienta útil que puede ayudar a muchas personas a no olvidar sus medicamentos, recordar sus citas médicas y estar preparadas ante cualquier emergencia, todo desde la comodidad de su teléfono móvil.
+
+---
+
+## Actualización: Gestión de Médicos, Historial de Tomas e Inventario
+
+Esta sección documenta las nuevas entidades, DAOs y lógica de negocio agregadas para soportar la vinculación de médicos a medicamentos, el registro histórico de tomas y el control de inventario de pastillas.
+
+### Orden de Modificación
+
+1. Entidad Médicos (`DoctorEntity`)
+2. Entidad Historial de Tomas (`MedicationHistoryEntity`)
+3. Entidad Medicamentos actualizada (`MedicationEntity`)
+4. Actualización de la Base de Datos (`AppDatabase`)
+5. Lógica del ViewModel para tomas e inventario
+
+---
+
+## DoctorEntity.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.data.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "doctors")
+data class DoctorEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String = "",
+    val specialty: String = "",
+    val phoneNumber: String = ""
+)
+```
+
+### Descripción General
+
+Entidad Room que representa a un médico registrado en la aplicación. Permite al usuario guardar los datos de sus doctores para luego vincularlos a medicamentos específicos.
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.data.entity`
+
+### Explicación Detallada
+
+**Campos de la entidad**
+
+- `id`: Clave primaria autogenerada por Room. Identifica de forma única a cada médico.
+- `name`: Nombre completo del médico.
+- `specialty`: Especialidad médica (ej. "Cardiología", "Medicina General").
+- `phoneNumber`: Número de contacto del médico.
+
+### Archivos Relacionados
+
+- `DoctorDao.kt` — Operaciones CRUD para acceder a esta tabla.
+- `AppDatabase.kt` — Registra esta entidad en la base de datos.
+- `MedicationEntity.kt` — Referencia al `id` del doctor mediante el campo `doctorId`.
+
+---
+
+## DoctorDao.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.data.dao
+
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import mx.edu.utng.aimc.com.pantallaprincipal.data.entity.DoctorEntity
+
+@Dao
+interface DoctorDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(doctor: DoctorEntity)
+
+    @Update
+    suspend fun update(doctor: DoctorEntity)
+
+    @Delete
+    suspend fun delete(doctor: DoctorEntity)
+
+    @Query("SELECT * FROM doctors")
+    fun getAllDoctors(): Flow<List<DoctorEntity>>
+
+    @Query("SELECT * FROM doctors WHERE id = :id")
+    suspend fun getDoctorById(id: Int): DoctorEntity?
+}
+```
+
+### Descripción General
+
+Interfaz DAO (Data Access Object) que define todas las operaciones de base de datos para la tabla `doctors`. Permite insertar, actualizar, eliminar y consultar médicos de forma reactiva o suspendida.
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.data.dao`
+
+### Explicación Detallada
+
+**Métodos**
+
+- `insert(doctor)`: Inserta un nuevo médico. Si ya existe un registro con el mismo `id`, lo reemplaza (`REPLACE`).
+- `update(doctor)`: Actualiza los datos de un médico existente.
+- `delete(doctor)`: Elimina un médico de la tabla.
+- `getAllDoctors()`: Retorna todos los médicos como un `Flow`, lo que permite a la UI reaccionar automáticamente a cualquier cambio en la lista.
+- `getDoctorById(id)`: Consulta suspendida que retorna un médico específico por su `id`, o `null` si no existe.
+
+### Archivos Relacionados
+
+- `DoctorEntity.kt` — La entidad que manipula este DAO.
+- `AppDatabase.kt` — Expone este DAO con `abstract fun doctorDao(): DoctorDao`.
+
+---
+
+## MedicationHistoryEntity.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.data.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "medication_history")
+data class MedicationHistoryEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val medicationId: Int = 0,
+    val medicationName: String = "",
+    val timestamp: Long = System.currentTimeMillis()
+)
+```
+
+### Descripción General
+
+Entidad Room que representa un registro individual de toma de medicamento. Cada vez que el usuario confirma que tomó una dosis, se crea una nueva entrada en esta tabla con la fecha y hora exacta.
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.data.entity`
+
+### Explicación Detallada
+
+**Campos de la entidad**
+
+- `id`: Clave primaria autogenerada. Identifica de forma única cada registro de toma.
+- `medicationId`: ID del medicamento al que corresponde esta toma. Funciona como referencia a `MedicationEntity.id`.
+- `medicationName`: Nombre del medicamento al momento de la toma. Se guarda por redundancia para facilitar la lectura del historial aunque el medicamento sea eliminado posteriormente.
+- `timestamp`: Marca de tiempo en milisegundos (`Long`) registrada automáticamente con `System.currentTimeMillis()` al crear el objeto. Permite ordenar y filtrar el historial por fecha.
+
+### Notas Importantes
+
+- El campo `timestamp` usa el tiempo del sistema en el momento de la instanciación del objeto, lo que garantiza precisión sin necesidad de que el usuario ingrese la hora manualmente.
+- Guardar `medicationName` directamente evita que el historial se pierda si el medicamento es eliminado de la tabla principal.
+
+### Archivos Relacionados
+
+- `MedicationHistoryDao.kt` — Operaciones de acceso para esta tabla.
+- `AppDatabase.kt` — Registra esta entidad.
+- `MedicationViewModel.kt` — Crea instancias de esta entidad al confirmar una toma.
+
+---
+
+## MedicationHistoryDao.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.data.dao
+
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import mx.edu.utng.aimc.com.pantallaprincipal.data.entity.MedicationHistoryEntity
+
+@Dao
+interface MedicationHistoryDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(history: MedicationHistoryEntity)
+
+    @Query("SELECT * FROM medication_history ORDER BY timestamp DESC")
+    fun getAllHistory(): Flow<List<MedicationHistoryEntity>>
+
+    @Delete
+    suspend fun delete(history: MedicationHistoryEntity)
+}
+```
+
+### Descripción General
+
+Interfaz DAO para la tabla `medication_history`. Permite insertar nuevos registros de toma, consultar el historial completo ordenado por fecha descendente y eliminar registros individuales.
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.data.dao`
+
+### Explicación Detallada
+
+**Métodos**
+
+- `insert(history)`: Inserta un nuevo registro de toma. La estrategia `REPLACE` evita errores si por alguna razón se intenta insertar un registro con ID duplicado.
+- `getAllHistory()`: Retorna todos los registros del historial como un `Flow`, ordenados del más reciente al más antiguo (`ORDER BY timestamp DESC`). Ideal para mostrar en pantalla sin necesidad de lógica de ordenamiento adicional.
+- `delete(history)`: Elimina un registro específico del historial.
+
+### Archivos Relacionados
+
+- `MedicationHistoryEntity.kt` — La entidad que manipula este DAO.
+- `AppDatabase.kt` — Expone este DAO con `abstract fun medicationHistoryDao(): MedicationHistoryDao`.
+- `MedicationViewModel.kt` — Llama a `insert()` cada vez que el usuario confirma una toma.
+
+---
+
+## MedicationEntity.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.data.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "medications")
+data class MedicationEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String = "",
+    val dose: String = "",
+    val note: String = "",
+    val schedules: List<String> = emptyList(),
+    val days: List<String> = emptyList(),
+    val totalDays: Int = 0,
+    val daysTaken: Int = 0,
+    val currentStock: Int = 0,
+    val lowStockThreshold: Int = 5,
+    val doctorId: Int? = null
+)
+```
+
+### Descripción General
+
+Entidad Room que representa un medicamento registrado. En esta versión actualizada se añadieron tres nuevos campos para soportar el control de inventario (`currentStock`, `lowStockThreshold`) y la vinculación con un médico (`doctorId`).
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.data.entity`
+
+### Explicación Detallada
+
+**Campos nuevos (respecto a la versión anterior)**
+
+- `currentStock`: Número de pastillas o dosis disponibles actualmente. Se descuenta en 1 cada vez que el usuario confirma una toma con `markAsTaken()`.
+- `lowStockThreshold`: Umbral de alerta de inventario bajo. El valor por defecto es 5. Cuando `currentStock` sea menor o igual a este valor, la app puede mostrar una advertencia al usuario para que reabastezca.
+- `doctorId`: Clave foránea opcional (`Int?`) que referencia al `id` de un `DoctorEntity`. Si es `null`, el medicamento no tiene médico asignado.
+
+**Campos previos conservados**
+
+- `id`, `name`, `dose`, `note`: Identificación y datos básicos del medicamento.
+- `schedules`: Lista de horarios en los que se debe tomar (ej. `["08:00", "20:00"]`).
+- `days`: Días de la semana en los que aplica (ej. `["Lunes", "Miércoles", "Viernes"]`).
+- `totalDays`: Duración total del tratamiento en días.
+- `daysTaken`: Contador de días que el usuario ha confirmado toma.
+
+### Notas Importantes
+
+- El campo `doctorId` es nullable (`Int?`) para mantener compatibilidad con medicamentos registrados antes de que existiera la funcionalidad de médicos.
+- La combinación de `currentStock` y `lowStockThreshold` permite implementar alertas proactivas sin lógica compleja: basta con comparar ambos valores.
+- Al ser una versión nueva de la entidad, se requirió incrementar la versión de `AppDatabase` de 4 a 5 y proporcionar una migración o `fallbackToDestructiveMigration()`.
+
+### Archivos Relacionados
+
+- `MedicationDao.kt` — Operaciones CRUD para esta tabla.
+- `AppDatabase.kt` — Registra esta entidad en versión 5.
+- `MedicationViewModel.kt` — Usa `copy()` para actualizar `daysTaken` y `currentStock` sin mutar el objeto original.
+- `DoctorEntity.kt` — Entidad referenciada por el campo `doctorId`.
+
+---
+
+## AppDatabase.kt
+
+```kotlin
+package mx.edu.utng.aimc.com.pantallaprincipal.data.database
+
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import mx.edu.utng.aimc.com.pantallaprincipal.data.dao.*
+import mx.edu.utng.aimc.com.pantallaprincipal.data.entity.*
+
+@Database(
+    entities = [
+        MedicationEntity::class,
+        AppointmentEntity::class,
+        EmergencyContactEntity::class,
+        DoctorEntity::class,
+        MedicationHistoryEntity::class
+    ],
+    version = 5
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun medicationDao(): MedicationDao
+    abstract fun doctorDao(): DoctorDao
+    abstract fun medicationHistoryDao(): MedicationHistoryDao
+    // ... otros DAOs
+}
+```
+
+### Descripción General
+
+Clase principal de la base de datos Room. En esta versión (v5) se registraron las dos nuevas entidades (`DoctorEntity` y `MedicationHistoryEntity`) y se expusieron sus DAOs correspondientes.
+
+### Ubicación
+
+`mx.edu.utng.aimc.com.pantallaprincipal.data.database`
+
+### Explicación Detallada
+
+**Cambios respecto a la versión anterior (v4)**
+
+- Se agregaron `DoctorEntity::class` y `MedicationHistoryEntity::class` al arreglo `entities`.
+- La versión se incrementó de 4 a 5 (`version = 5`). Room requiere este cambio cada vez que el esquema de la base de datos es modificado.
+- Se expusieron dos nuevos métodos abstractos: `doctorDao()` y `medicationHistoryDao()`.
+
+**Entidades registradas**
+
+La base de datos en versión 5 gestiona las siguientes tablas: `medications`, `appointments`, `emergency_contacts`, `doctors` y `medication_history`.
+
+### Notas Importantes
+
+- Al cambiar la versión de la base de datos, Room lanzará una excepción en tiempo de ejecución si no se provee una migración. Durante desarrollo es común usar `fallbackToDestructiveMigration()` en el `Builder`, lo que borra y recrea la base de datos. Para producción se deben escribir migraciones explícitas con `Migration(oldVersion, newVersion)`.
+- Los comentarios `// ... otros DAOs` indican que `AppointmentDao` y `EmergencyContactDao` también están declarados en esta clase aunque no se muestren en el fragmento.
+
+### Archivos Relacionados
+
+- `DoctorEntity.kt`, `MedicationHistoryEntity.kt` — Entidades nuevas registradas en esta versión.
+- `DoctorDao.kt`, `MedicationHistoryDao.kt` — DAOs expuestos por esta clase.
+- El módulo de inyección de dependencias (Hilt/manual) — Donde se construye la instancia de `AppDatabase` con `Room.databaseBuilder()`.
