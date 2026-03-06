@@ -2,7 +2,7 @@
 
 ## Introducción
 
-MediAlerta es una aplicación móvil desarrollada para Android que tiene como objetivo ayudar a las personas a llevar un control más organizado de su salud. La aplicación nace de la necesidad de muchas personas que toman medicamentos de forma regular, tienen citas médicas frecuentes o simplemente quieren estar preparados ante cualquier emergencia.
+App Salud es una aplicación móvil desarrollada para Android que tiene como objetivo ayudar a las personas a llevar un control más organizado de su salud. La aplicación nace de la necesidad de muchas personas que toman medicamentos de forma regular, tienen citas médicas frecuentes o simplemente quieren estar preparados ante cualquier emergencia.
 
 La aplicación permite a los usuarios registrar sus medicamentos con sus respectivos horarios y dosis, programar citas médicas, guardar contactos de emergencia y localizar farmacias cercanas a su ubicación. Todo esto en un solo lugar, con una interfaz colorida y fácil de usar que no requiere conocimientos técnicos.
 
